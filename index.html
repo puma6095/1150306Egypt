@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UGY 醫學人文活動成果｜奇美博物館參訪問卷分析</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dark: #8B6914;
+    --sand: #F5EDD8;
+    --sand-light: #FDF8EF;
+    --ink: #1A1209;
+    --ink-mid: #3D2B0E;
+    --ink-soft: #6B5B3E;
+    --lapis: #1B3A6B;
+    --lapis-light: #2D5AA0;
+    --papyrus: #FAF3E0;
+    --cream: #FFFEF7;
+    --green-soft: #2D6A4F;
+    --red-soft: #9B2335;
+    --white: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--papyrus);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ---- HERO ---- */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 60px 24px;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 110%, #8B6914 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 20% -10%, #2D1B00 0%, transparent 55%),
+      radial-gradient(ellipse 50% 50% at 80% 0%, #1B3A6B22 0%, transparent 50%),
+      linear-gradient(160deg, #0D0A04 0%, #1A1209 40%, #0A0603 100%);
+  }
+
+  .hero-hieroglyphs {
+    position: absolute; inset: 0;
+    opacity: 0.04;
+    font-size: clamp(40px, 6vw, 80px);
+    line-height: 1.2;
+    letter-spacing: 0.3em;
+    overflow: hidden;
+    pointer-events: none;
+    display: flex; flex-wrap: wrap; align-content: flex-start;
+    padding: 10px;
+    color: var(--gold);
+  }
+
+  .hero-line {
+    position: relative; z-index: 2;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Noto Sans TC', sans-serif;
+    font-size: clamp(11px, 1.5vw, 13px);
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(32px, 7vw, 88px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.4s forwards;
+  }
+
+  .hero-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(16px, 3vw, 28px);
+    font-style: italic;
+    color: var(--gold-light);
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.6s forwards;
+  }
+
+  .hero-divider {
+    width: 120px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 0 auto 36px;
+    opacity: 0;
+    animation: fadeUp 0.9s 0.8s forwards;
+  }
+
+  .hero-meta {
+    display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.9s 1s forwards;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+  .hero-stat-num {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .hero-stat-label {
+    font-size: 12px;
+    font-weight: 400;
+    color: #BBA87A;
+    letter-spacing: 0.15em;
+    margin-top: 6px;
+  }
+
+  .hero-sep { width: 1px; background: #3D3020; align-self: stretch; }
+
+  .scroll-hint {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeUp 1s 1.4s forwards;
+    color: #7A6840; font-size: 11px; letter-spacing: 0.2em;
+  }
+  .scroll-arrow {
+    width: 20px; height: 20px;
+    border-right: 1.5px solid var(--gold-dark);
+    border-bottom: 1.5px solid var(--gold-dark);
+    transform: rotate(45deg);
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  /* ---- NAV TABS ---- */
+  .nav-bar {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(26, 18, 9, 0.96);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #2A1F0E;
+    padding: 0 24px;
+    display: flex; justify-content: center;
+  }
+  .nav-tabs {
+    display: flex; gap: 0; overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .nav-tab {
+    padding: 16px 22px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #7A6840;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    background: none; border-top: none; border-left: none; border-right: none;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .nav-tab:hover { color: var(--gold-light); }
+  .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ---- SECTIONS ---- */
+  .section {
+    max-width: 1100px; margin: 0 auto;
+    padding: 80px 24px;
+    display: none;
+  }
+  .section.active { display: block; }
+
+  .section-header {
+    text-align: center; margin-bottom: 56px;
+  }
+  .section-tag {
+    font-size: 11px; font-weight: 500;
+    letter-spacing: 0.4em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(26px, 4vw, 44px);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .section-desc {
+    font-size: 15px; color: var(--ink-soft);
+    line-height: 1.8; max-width: 580px; margin: 0 auto;
+  }
+
+  /* ---- SCORE CARDS ---- */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px; margin-bottom: 48px;
+  }
+  .score-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 28px 20px;
+    border: 1px solid #E8DFC8;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .score-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+  .score-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  }
+  .card-dimension {
+    font-size: 12px; font-weight: 500; color: var(--gold-dark);
+    letter-spacing: 0.05em; margin-bottom: 12px;
+  }
+  .card-scores {
+    display: flex; align-items: flex-end; gap: 12px; margin-bottom: 14px;
+  }
+  .card-score-group { text-align: center; }
+  .card-score-num {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 28px; font-weight: 700;
+    line-height: 1;
+  }
+  .card-score-num.pre { color: #9BA8BE; }
+  .card-score-num.post { color: var(--lapis); }
+  .card-score-label { font-size: 10px; color: var(--ink-soft); margin-top: 4px; letter-spacing: 0.05em; }
+  .card-arrow { font-size: 18px; color: #CCC; padding-bottom: 14px; }
+  .card-diff {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #ECFDF5; color: var(--green-soft);
+    font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+  }
+  .progress-bar {
+    height: 4px; background: #F0E8D5; border-radius: 2px; margin-top: 14px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 2px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ---- TOTAL BANNER ---- */
+  .total-banner {
+    background: linear-gradient(135deg, var(--ink) 0%, #2A1A08 100%);
+    border-radius: 16px; padding: 36px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 24px;
+    margin-bottom: 48px;
+    border: 1px solid #3D2B0E;
+  }
+  .total-left { }
+  .total-label { font-size: 12px; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 8px; font-weight: 500; }
+  .total-nums {
+    display: flex; align-items: baseline; gap: 16px;
+  }
+  .total-num {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 700; color: var(--cream); line-height: 1;
+  }
+  .total-arrow { font-size: 28px; color: #4A3820; }
+  .total-badge {
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 22px; font-weight: 900;
+    font-family: 'Noto Serif TC', serif;
+    padding: 16px 32px; border-radius: 12px;
+    text-align: center;
+  }
+  .total-badge-sub { font-size: 12px; font-weight: 500; margin-top: 4px; letter-spacing: 0.1em; }
+
+  /* ---- CHART ---- */
+  .chart-wrap {
+    background: var(--white); border-radius: 16px;
+    padding: 36px; border: 1px solid #E8DFC8;
+    margin-bottom: 48px;
+  }
+  .chart-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 18px; font-weight: 600; color: var(--ink);
+    margin-bottom: 24px; text-align: center;
+  }
+
+  /* ---- REFLECTIONS ---- */
+  .reflection-tabs {
+    display: flex; gap: 0; margin-bottom: 32px;
+    border-bottom: 2px solid #E8DFC8;
+  }
+  .rtab {
+    padding: 12px 24px; font-size: 14px; font-weight: 500;
+    color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -2px; transition: color 0.2s, border-color 0.2s;
+    background: none; border-top: none; border-left: none; border-right: none;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .rtab:hover { color: var(--gold-dark); }
+  .rtab.active { color: var(--gold-dark); border-bottom-color: var(--gold); }
+
+  .rtab-content { display: none; }
+  .rtab-content.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+
+  .quote-card {
+    background: var(--white); border-radius: 12px;
+    padding: 24px; border: 1px solid #EDE4CE;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .quote-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+  .quote-mark {
+    font-family: 'Playfair Display', serif;
+    font-size: 56px; font-style: italic;
+    color: var(--sand); line-height: 0.5;
+    float: left; margin-right: 8px; margin-top: 12px;
+  }
+  .quote-text {
+    font-size: 14px; line-height: 1.85;
+    color: var(--ink-mid); font-weight: 300;
+    clear: both;
+  }
+  .quote-author {
+    margin-top: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .author-dot {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--ink);
+    flex-shrink: 0;
+  }
+  .author-info { }
+  .author-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .author-dept { font-size: 11px; color: var(--ink-soft); }
+
+  /* ---- MATCHED TABLE ---- */
+  .table-wrap {
+    background: var(--white); border-radius: 16px;
+    overflow: hidden; border: 1px solid #E8DFC8;
+  }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 700px; }
+  thead th {
+    background: var(--ink); color: var(--gold);
+    font-size: 12px; font-weight: 500; letter-spacing: 0.08em;
+    padding: 14px 16px; text-align: center;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  thead th:first-child { text-align: left; }
+  tbody tr { border-bottom: 1px solid #F2EAD8; transition: background 0.15s; }
+  tbody tr:hover { background: var(--sand-light); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 13px 16px; font-size: 13px; color: var(--ink-mid); text-align: center; }
+  tbody td:first-child { text-align: left; font-weight: 500; }
+  .td-pre { color: #9BA8BE; }
+  .td-post { color: var(--lapis); font-weight: 600; }
+  .td-up { color: var(--green-soft); font-weight: 700; }
+  .td-same { color: var(--ink-soft); }
+  .td-down { color: var(--red-soft); font-weight: 700; }
+  .mini-bar {
+    display: inline-block; width: 40px; height: 4px;
+    background: #EDE4CE; border-radius: 2px; vertical-align: middle; margin-left: 6px;
+    position: relative; overflow: hidden;
+  }
+  .mini-bar-fill {
+    position: absolute; top: 0; left: 0; height: 100%;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+    border-radius: 2px;
+  }
+
+  /* ---- STATS ---- */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px; margin-bottom: 48px;
+  }
+  .dist-card {
+    background: var(--white); border-radius: 16px;
+    padding: 32px; border: 1px solid #E8DFC8;
+  }
+  .dist-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 16px; font-weight: 600; color: var(--ink);
+    margin-bottom: 24px;
+  }
+  .dist-item {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+  }
+  .dist-label { font-size: 13px; color: var(--ink-soft); min-width: 80px; }
+  .dist-bar-wrap { flex: 1; height: 8px; background: #F0E8D5; border-radius: 4px; overflow: hidden; }
+  .dist-bar-fill {
+    height: 100%; border-radius: 4px;
+    background: linear-gradient(90deg, var(--lapis), var(--lapis-light));
+    transition: width 1s ease;
+  }
+  .dist-count { font-size: 13px; font-weight: 600; color: var(--ink); min-width: 28px; text-align: right; }
+
+  /* ---- CONCLUSION ---- */
+  .conclusion-box {
+    background: linear-gradient(135deg, var(--ink) 0%, #1E1508 100%);
+    border-radius: 20px; padding: 56px 48px;
+    text-align: center; position: relative; overflow: hidden;
+    border: 1px solid #3D2B0E;
+  }
+  .conclusion-box::before {
+    content: '𓂀';
+    position: absolute; font-size: 200px; opacity: 0.03;
+    top: -30px; right: -20px; line-height: 1;
+  }
+  .conclusion-tag {
+    font-size: 11px; letter-spacing: 0.4em; color: var(--gold);
+    margin-bottom: 24px; font-weight: 500;
+  }
+  .conclusion-title {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(22px, 4vw, 38px);
+    font-weight: 700; color: var(--cream);
+    line-height: 1.4; margin-bottom: 24px;
+  }
+  .conclusion-desc {
+    font-size: 15px; color: #BBA87A;
+    line-height: 1.9; max-width: 640px; margin: 0 auto 36px;
+  }
+  .conclusion-points {
+    display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;
+  }
+  .c-point {
+    background: rgba(201, 168, 76, 0.1);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 10px; padding: 20px 24px;
+    max-width: 220px; text-align: center;
+  }
+  .c-point-icon { font-size: 28px; margin-bottom: 10px; }
+  .c-point-text { font-size: 13px; color: #D4B87A; line-height: 1.6; }
+
+  /* ---- FOOTER ---- */
+  footer {
+    background: var(--ink); padding: 36px 24px; text-align: center;
+    border-top: 1px solid #2A1F0E;
+  }
+  footer p { font-size: 12px; color: #5A4A30; letter-spacing: 0.1em; }
+  footer strong { color: var(--gold-dark); }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: rotate(45deg) translateY(0); }
+    50% { transform: rotate(45deg) translateY(6px); }
+  }
+
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+
+  @media (max-width: 600px) {
+    .hero-meta { gap: 20px; }
+    .hero-sep { display: none; }
+    .total-banner { flex-direction: column; text-align: center; }
+    .conclusion-box { padding: 36px 24px; }
+    .rtab-content.active { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-hieroglyphs">𓂀𓆣𓋴𓏏𓂧𓃀𓆑𓅓𓏤𓏦𓈖𓂋𓌀𓎼𓏙𓂸𓆉𓏠𓋴𓄿𓇋𓏲𓄤𓂝𓅱𓇲𓈙𓆙𓋹𓌀𓂤𓃭𓇋𓆙𓍿𓅱𓃱𓆸𓊪𓇳𓂀𓆣𓋴𓏏𓂧𓃀𓆑𓅓𓏤𓏦𓈖𓂋𓌀𓎼𓏙𓂸𓆉𓏠𓋴𓄿𓇋𓏲𓄤𓂝𓅱𓇲𓈙𓆙𓋹𓌀𓂤𓃭𓇋𓆙𓍿𓅱𓃱𓆸𓊪𓇳𓂀𓆣𓋴𓏏𓂧𓃀𓆑𓅓𓏤𓏦𓈖𓂋𓌀𓎼𓏙𓂸𓆉𓏠𓋴𓄿𓇋𓏲𓄤𓂝𓅱𓇲𓈙𓆙𓋹𓌀𓂤𓃭𓇋𓆙𓍿𓅱𓃱𓆸𓊪𓇳</div>
+
+  <div class="hero-line">
+    <div class="hero-eyebrow">奇美醫院 UGY 醫學人文活動成果報告</div>
+    <div class="hero-title">法老的問卷</div>
+    <div class="hero-subtitle">埃及之王特展 × 醫學人文反思</div>
+    <div class="hero-divider"></div>
+    <div class="hero-meta">
+      <div class="hero-stat">
+        <div class="hero-stat-num">33</div>
+        <div class="hero-stat-label">前測人數</div>
+      </div>
+      <div class="hero-sep"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">30</div>
+        <div class="hero-stat-label">後測人數</div>
+      </div>
+      <div class="hero-sep"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">5</div>
+        <div class="hero-stat-label">參與院校</div>
+      </div>
+      <div class="hero-sep"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">+17%</div>
+        <div class="hero-stat-label">整體進步</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-arrow"></div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('scores', this)">📊 評量成效</button>
+    <button class="nav-tab" onclick="showSection('reflections', this)">💬 學員反思</button>
+    <button class="nav-tab" onclick="showSection('paired', this)">📋 配對明細</button>
+    <button class="nav-tab" onclick="showSection('stats', this)">📈 統計分布</button>
+    <button class="nav-tab" onclick="showSection('conclusion', this)">🎓 成果結論</button>
+  </div>
+</nav>
+
+<!-- SECTION 1: SCORES -->
+<section id="sec-scores" class="section active">
+  <div class="section-header">
+    <div class="section-tag">Assessment Results</div>
+    <h2 class="section-title">前後測評量成效</h2>
+    <p class="section-desc">參訪活動後，學員在各項醫學人文評量向度均有顯著提升，其中自我省思能力進步幅度最為突出。</p>
+  </div>
+
+  <div class="total-banner reveal">
+    <div class="total-left">
+      <div class="total-label">OVERALL AVERAGE SCORE</div>
+      <div class="total-nums">
+        <div>
+          <div class="total-num" style="color:#9BA8BE">3.94</div>
+          <div style="font-size:11px;color:#5A6A7A;margin-top:6px;letter-spacing:0.1em">前測</div>
+        </div>
+        <div class="total-arrow">→</div>
+        <div>
+          <div class="total-num">4.61</div>
+          <div style="font-size:11px;color:#BBA87A;margin-top:6px;letter-spacing:0.1em">後測</div>
+        </div>
+      </div>
+    </div>
+    <div class="total-badge">
+      +17.1%
+      <div class="total-badge-sub">整體進步幅度</div>
+    </div>
+  </div>
+
+  <div class="score-grid" id="score-cards"></div>
+
+  <div class="chart-wrap reveal">
+    <div class="chart-title">前後測各向度分數對照圖</div>
+    <canvas id="mainChart" height="100"></canvas>
+  </div>
+</section>
+
+<!-- SECTION 2: REFLECTIONS -->
+<section id="sec-reflections" class="section">
+  <div class="section-header">
+    <div class="section-tag">Student Reflections</div>
+    <h2 class="section-title">學員後測反思精選</h2>
+    <p class="section-desc">30 位學員在參訪後留下深刻的醫學人文反思，展現古文明與現代醫學之間的深度對話。</p>
+  </div>
+
+  <div class="reflection-tabs">
+    <button class="rtab active" onclick="showRTab('r1', this)">🌟 聯想到的醫學主題</button>
+    <button class="rtab" onclick="showRTab('r2', this)">🏛️ 印象最深刻的展品</button>
+    <button class="rtab" onclick="showRTab('r3', this)">🩺 對臨床執業的啟發</button>
+  </div>
+
+  <div id="rtab-r1" class="rtab-content active" id="r1"></div>
+  <div id="rtab-r2" class="rtab-content"></div>
+  <div id="rtab-r3" class="rtab-content"></div>
+</section>
+
+<!-- SECTION 3: PAIRED -->
+<section id="sec-paired" class="section">
+  <div class="section-header">
+    <div class="section-tag">Individual Results</div>
+    <h2 class="section-title">前後測配對明細</h2>
+    <p class="section-desc">30 位學員完成前後測配對，以下呈現每位學員的個人分數變化。</p>
+  </div>
+  <div class="table-wrap reveal">
+    <div class="table-scroll">
+      <table id="pairedTable">
+        <thead>
+          <tr>
+            <th style="text-align:left">#  姓名</th>
+            <th>科別</th>
+            <th>前測均</th>
+            <th>後測均</th>
+            <th>進步</th>
+            <th>各項後測</th>
+          </tr>
+        </thead>
+        <tbody id="pairedBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: STATS -->
+<section id="sec-stats" class="section">
+  <div class="section-header">
+    <div class="section-tag">Distribution Analysis</div>
+    <h2 class="section-title">學員統計分布</h2>
+    <p class="section-desc">本次活動涵蓋多所醫學院校及各實習科別，呈現豐富的多元性。</p>
+  </div>
+  <div class="stats-grid" id="statsGrid"></div>
+  <div class="chart-wrap reveal">
+    <div class="chart-title">各評量向度描述統計（前後測標準差比較）</div>
+    <canvas id="sdChart" height="100"></canvas>
+  </div>
+</section>
+
+<!-- SECTION 5: CONCLUSION -->
+<section id="sec-conclusion" class="section">
+  <div class="section-header">
+    <div class="section-tag">Outcomes & Conclusion</div>
+    <h2 class="section-title">活動成果結論</h2>
+  </div>
+  <div class="conclusion-box reveal">
+    <div class="conclusion-tag">MEDICAL HUMANITIES OUTCOMES 2026</div>
+    <h3 class="conclusion-title">古文明的啟示，現代醫者的省思</h3>
+    <p class="conclusion-desc">
+      本次奇美博物館「埃及之王 法老」特展參訪，作為 UGY 醫學人文活動，
+      成功引發 30 位實習醫學生對生死、平等、謙卑與人文關懷的深刻思考。
+      後測各向度分數均顯著高於前測，印證本活動對醫學人文素養養成之正向效益。
+    </p>
+    <div class="conclusion-points">
+      <div class="c-point">
+        <div class="c-point-icon">⚖️</div>
+        <div class="c-point-text">疾病面前人人平等<br>謙卑行醫的核心價值</div>
+      </div>
+      <div class="c-point">
+        <div class="c-point-icon">🧬</div>
+        <div class="c-point-text">古埃及解剖觀<br>對應現代臨床思維</div>
+      </div>
+      <div class="c-point">
+        <div class="c-point-icon">🕊️</div>
+        <div class="c-point-text">安寧與生命有限性<br>重新詮釋醫者角色</div>
+      </div>
+      <div class="c-point">
+        <div class="c-point-icon">💎</div>
+        <div class="c-point-text">自我省思能力<br>進步幅度最顯著 +44.7%</div>
+      </div>
+    </div>
+    <div style="margin-top:40px;padding-top:32px;border-top:1px solid rgba(201,168,76,0.15)">
+      <p style="color:#7A6840;font-size:12px;letter-spacing:0.15em">
+        活動日期：2026年3月6日 ｜ 地點：奇美博物館 ｜ 特展：埃及之王 法老<br>
+        參與人數：33人前測 / 30人後測 ｜ 主辦：奇美醫院教學部
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>奇美醫院教學部</strong> UGY 醫學人文活動成果報告 ｜ 2026年3月 ｜ 教學醫院評鑑用途</p>
+</footer>
+
+<script>
+// ===== DATA =====
+const scoreLabels = ['文化人文涵養', '同理心與生死觀', '自我省思能力', '批判性思考', '整體學習收穫'];
+const preAvgs = [4.00, 4.06, 3.18, 4.36, 4.09];
+const postAvgs = [4.57, 4.50, 4.60, 4.73, 4.67];
+const preStds = [1.00, 0.96, 1.32, 0.64, 0.83];
+const postStds = [0.50, 0.57, 0.50, 0.52, 0.48];
+
+const pairedData = [
+  {name:'黄瑋庭',dept:'內科',pre:[4,4,4,4,4],post:[4,4,4,4,4]},
+  {name:'黃楷宸',dept:'泌尿科',pre:[3,3,3,3,3],post:[4,4,3,4,4]},
+  {name:'吳俊賢',dept:'婦產科',pre:[2,3,1,1,1],post:[4,5,5,5,5]},
+  {name:'鄭景陽',dept:'婦產科',pre:[4,4,3,4,5],post:[5,5,5,5,5]},
+  {name:'郭勇德',dept:'復健科',pre:[5,5,3,4,4],post:[5,5,5,5,5]},
+  {name:'蔡承翰',dept:'內科',pre:[4,5,5,5,5],post:[4,4,4,4,4]},
+  {name:'蒲煦宜',dept:'腎內',pre:[5,5,3,5,5],post:[4,4,4,5,4]},
+  {name:'林達人',dept:'泌尿外科',pre:[5,5,5,5,5],post:[5,5,5,5,5]},
+  {name:'林郁晉',dept:'復健科',pre:[2,1,2,3,2],post:[4,4,4,4,5]},
+  {name:'張祥樺',dept:'兒科',pre:[5,5,5,5,5],post:[5,5,5,5,5]},
+  {name:'邱珮婷',dept:'婦產科',pre:[3,4,3,5,4],post:[4,4,4,5,4]},
+  {name:'黎碧心',dept:'外科',pre:[4,4,3,4,4],post:[5,4,4,5,4]},
+  {name:'方偉丞',dept:'耳鼻喉',pre:[5,5,4,5,3],post:[4,4,4,5,4]},
+  {name:'許庭瑋',dept:'ICU',pre:[5,5,3,5,5],post:[5,4,4,5,5]},
+  {name:'洪伊琳',dept:'外科',pre:[5,5,3,5,5],post:[5,5,5,5,5]},
+  {name:'蘇品銓',dept:'精神',pre:[5,4,5,5,5],post:[5,5,5,5,5]},
+  {name:'陳璽安',dept:'耳鼻喉科',pre:[5,5,5,5,5],post:[5,5,5,5,5]},
+  {name:'古博元',dept:'內科',pre:[5,3,1,5,5],post:[5,5,5,5,5]},
+  {name:'林資堯',dept:'ICU',pre:[3,3,3,3,3],post:[4,4,4,4,4]},
+  {name:'胡峻彰',dept:'風免',pre:[4,5,3,5,3],post:[4,4,4,4,4]},
+  {name:'何柏陞',dept:'急診',pre:[4,4,1,5,4],post:[5,4,5,3,4]},
+  {name:'劉林昌',dept:'兒科',pre:[4,4,2,3,4],post:[4,4,4,5,4]},
+  {name:'林妤真',dept:'急診',pre:[4,4,2,5,4],post:[5,5,4,5,5]},
+  {name:'謝禮謙',dept:'內科',pre:[3,3,3,3,3],post:[5,5,5,5,5]},
+  {name:'劉芃忻',dept:'心臟內科',pre:[5,5,4,5,4],post:[5,5,5,5,5]},
+  {name:'陳亞筠',dept:'骨科',pre:[3,3,3,4,4],post:[5,5,5,5,5]},
+  {name:'林汧卉',dept:'血液腫瘤科',pre:[5,5,5,5,5],post:[5,5,5,5,5]},
+  {name:'陳淳恩',dept:'外科',pre:[4,4,4,5,5],post:[5,5,5,5,5]},
+  {name:'張博勛',dept:'外科',pre:[5,5,5,5,5],post:[5,5,5,5,5]},
+  {name:'譚子洋',dept:'內科',pre:[4,3,3,5,4],post:[4,3,5,5,4]},
+];
+
+const reflections = {
+  r1: [
+    {name:'謝禮謙',dept:'內科',text:'他們透過木乃伊化保存遺體，認為只要身體完整，靈魂便能在來世繼續存在。身為醫學生，我過去多從生理與醫學角度理解死亡，但這次讓我意識到，死亡不只是生物學事件，也包含文化、信仰與人類對生命意義的追尋。'},
+    {name:'游承軒',dept:'急診科',text:'從現代醫學看，死亡是生理機能的終點。但在古埃及，死亡是「進入永生的過渡期」。軀體保存反映了人類對對抗腐敗與生物侷限性的渴望。這提醒我們，醫學除了修復軀體，更在於安撫人類對未知的恐懼。'},
+    {name:'鄭景陽',dept:'婦產科',text:'我覺得真正的永生或許不只是肉體上的存留，而是你的故事及形象有沒有被後人記得。'},
+    {name:'張祥樺',dept:'兒科',text:'我體悟到古埃及以香料與乾燥保存軀體，是反映對物質延續的執著；而在醫學則在解剖中洞見生命的脆弱與轉瞬，學會放下執念，敬畏自然代謝。'},
+    {name:'林資堯',dept:'ICU',text:'我認為死亡是不可避免的，軀體保存可以應用在器官捐贈這個項目上，讓自己生命的一部分繼續傳承下去，達到變相的永生。'},
+    {name:'張博勛',dept:'外科',text:'古埃及文明對「永生」的追求，使我重新思考醫學中對於死亡與人體的理解。展覽讓我意識到，死亡並不是醫學的失敗，而是生命自然的一部分。'},
+    {name:'黎碧心',dept:'外科',text:'古埃及人透過木乃伊保存身體以追求永生，在臨床上，醫師經常需要面對死亡。這讓我體會到，醫學不僅是延長生命，也包含理解死亡、尊重遺體，以及幫助病人有尊嚴地走完生命的最後階段。'},
+    {name:'劉林昌',dept:'兒科',text:'或許物理上無法達到真正的永生，但隨著AI及大數據科技發展，或許未來的人類會以「數位備份」的方式達到永恆的存在，如同古代的歷史由壁畫石雕保留下來。'},
+    {name:'古博元',dept:'內科',text:'埃及人對於死亡蠻害怕的，即便是繁華的法老擁有無數的寶藏、土地等等，最後也是埋葬於塵土，因此應當好好把握人生、不虛度光陰。'},
+    {name:'邱珮婷',dept:'婦產科',text:'死亡不是生命的重點，而是另一個境地的起點，透過軀體保存讓埃及人有心靈上的寄託，值得我們深思其中意涵。'},
+  ],
+  r2: [
+    {name:'謝禮謙',dept:'內科',text:'「心臟審判」的描繪讓我印象深刻。古埃及人相信人在死後，心臟會被放在天秤上與「真理之羽」進行衡量，顯示古埃及人認為心臟是思想、情感與道德的中心。'},
+    {name:'游承軒',dept:'急診科',text:'卡諾卜罐：罐子分別存放肺、肝、腸、胃。這反映了古埃及人已具備早期的解剖學概念，知道這些臟器是維持生命的關鍵。'},
+    {name:'張祥樺',dept:'兒科',text:'那爾邁調色板：顯示國王戴著上埃及的白色王冠擊打敵人，而這一面他戴著下埃及的紅色王冠。這代表他同時統治了兩個地區。'},
+    {name:'陳璽安',dept:'耳鼻喉科',text:'塞赫麥特是獅首的埃及醫療之神，同時也是戰爭之神，這讓我聯想到感染，在古埃及醫療資源匱乏，往往有嚴重的發燒發炎症狀。'},
+    {name:'林妤真',dept:'急診',text:'帶來戰爭的塞赫麥特在喝下酒之後才停止殺戮，讓我想到酒精的對身體的中樞抑制效應，導致視覺與聽覺麻痺、肢體動作失調。'},
+    {name:'古博元',dept:'內科',text:'賽提二世王的坐像，在他的雕像中可以看到肌肉和骨骼的結構，以之前的工藝來說非常厲害，尤其大腿的髕骨的位置比例蠻精準的。'},
+    {name:'洪伊琳',dept:'外科',text:'在神殿入口看到的三個小雕像擺出歡迎手勢，手臂的三角肌、二頭肌、股四頭肌都雕塑的非常漂亮，女人塞赫麥的雕像也能清楚看見女性身體的特徵。'},
+    {name:'張博勛',dept:'外科',text:'木乃伊製作時，腦部通常會被取出並丟棄，而心臟則被保留在體內，因為古埃及人認為心臟是思考與靈魂所在的器官。這讓我聯想到醫學史上的「心臟中心論」。'},
+    {name:'林資堯',dept:'ICU',text:'導覽人員有提到一位法老，頭型看起來很像外星人，讓我聯想到醫學上的舟狀頭，也會有這樣的頭部畸形。'},
+    {name:'劉林昌',dept:'兒科',text:'我對「安卡」這個符號感到很有興趣，因為它代表了賦予生命，符號像是十字架上面有一個圈圈，我覺得它很像藥瓶也像打針，就像生病的人經過醫療賦予新生命。'},
+  ],
+  r3: [
+    {name:'謝禮謙',dept:'內科',text:'法老即使擁有至高無上的權力，仍然無法避免疾病與死亡，這也提醒我，醫療的本質並不是戰勝死亡，而是在有限的生命中盡可能減輕病人的痛苦、維持生活品質。'},
+    {name:'游承軒',dept:'急診科',text:'無論權力再大，在疾病與生物規律面前人人平等。這啟發醫者應具備謙卑感，不因患者的社會地位而改變醫療品質。醫學有其極限，這提醒我們在提升技術之餘，更要注重安寧與人文關懷。'},
+    {name:'張祥樺',dept:'兒科',text:'面對生死，權力亦顯渺小。這啟發我以謙卑與平等之心對待每位患者，在專業上追求卓越，在生命前保持敬畏與人文關懷。'},
+    {name:'黎碧心',dept:'外科',text:'醫師的專業不只是醫療技術，更包括謙遜、同理與對每一位病人的公平對待。無論是高社經地位的病人或弱勢族群，在診療決策、溝通與照護品質上都應一視同仁。'},
+    {name:'洪伊琳',dept:'外科',text:'不論貧富貴賤種族，生命都是有限的。在行醫時，如何實踐「公平」原則是需要在醫療領域中透過不同的經驗去成長、內化的。'},
+    {name:'林資堯',dept:'ICU',text:'不論醫學多麼進步，死亡是不可避免的，使我重新思考安寧醫學的必要性，也許尊重生命自然的進程對病人來說是比較好的選擇。'},
+    {name:'鍾丹卉',dept:'加護醫學科',text:'使我更尊重生命，期許能以病人為中心，除了生理上，心理和社會需求也能一併滿足。'},
+    {name:'張博勛',dept:'外科',text:'醫師的價值，不只是延長生命，更在於尊重生命、理解死亡，並在兩者之間提供最有溫度的照護。'},
+    {name:'郭勇德',dept:'復健科',text:'死亡面前人人平等。身為醫師，只要盡自己最大所能協助病人對抗疾病即問心無愧。'},
+    {name:'劉芃忻',dept:'心臟內科',text:'面對疾病，人人都是平等而脆弱的。作為醫護人員，我們可以以治療「疾病」、關懷「人」的方式面對患者，增進專業素養。'},
+    {name:'邱珮婷',dept:'婦產科',text:'面對疾病我們永遠有讀不完的書以及需要不斷進步來面對眾多困難，身為一位醫師我希望未來自己可以不斷精益求精，希望可以幫助到更多的人。'},
+    {name:'陳璽安',dept:'耳鼻喉科',text:'這讓我體會到生命的無常性是在任何人身上都可能會發生的，因此要學習敬畏生命。'},
+  ]
+};
+
+const schoolDist = {'中山醫學大學':20,'國立中山大學':6,'高雄醫學大學':4,'成功大學':2,'長庚大學':1};
+const deptDist = {'內科':6,'外科':4,'婦產科':3,'急診':3,'復健科':2,'兒科':2,'加護/ICU':3,'耳鼻喉科':2,'影像科':1,'骨科':1,'其他':6};
+const gradeDist = {'醫六（正規學制）':26,'後醫四':5,'後醫三':2};
+
+// ===== RENDER =====
+function init() {
+  renderScoreCards();
+  renderMainChart();
+  renderReflections();
+  renderPairedTable();
+  renderStats();
+  renderSDChart();
+  setupReveal();
+}
+
+function renderScoreCards() {
+  const container = document.getElementById('score-cards');
+  scoreLabels.forEach((label, i) => {
+    const pre = preAvgs[i], post = postAvgs[i];
+    const diff = post - pre;
+    const pct = (diff/pre*100).toFixed(1);
+    const card = document.createElement('div');
+    card.className = 'score-card reveal reveal-delay-' + (i%3+1);
+    card.innerHTML = `
+      <div class="card-dimension">${label}</div>
+      <div class="card-scores">
+        <div class="card-score-group">
+          <div class="card-score-num pre">${pre.toFixed(2)}</div>
+          <div class="card-score-label">前測</div>
+        </div>
+        <div class="card-arrow">→</div>
+        <div class="card-score-group">
+          <div class="card-score-num post">${post.toFixed(2)}</div>
+          <div class="card-score-label">後測</div>
+        </div>
+      </div>
+      <div class="card-diff">▲ +${diff.toFixed(2)} &nbsp;(+${pct}%)</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${post/5*100}%"></div></div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderMainChart() {
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: scoreLabels,
+      datasets: [
+        {
+          label: '前測',
+          data: preAvgs,
+          backgroundColor: 'rgba(155,168,190,0.7)',
+          borderColor: 'rgba(155,168,190,1)',
+          borderWidth: 1, borderRadius: 4,
+        },
+        {
+          label: '後測',
+          data: postAvgs,
+          backgroundColor: 'rgba(201,168,76,0.85)',
+          borderColor: 'rgba(201,168,76,1)',
+          borderWidth: 1, borderRadius: 4,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Noto Sans TC', size: 13 } } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toFixed(2)} 分` } }
+      },
+      scales: {
+        y: { min: 0, max: 5, ticks: { stepSize: 1, font: { family: 'Noto Sans TC' } },
+          grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { ticks: { font: { family: 'Noto Sans TC', size: 12 } },
+          grid: { display: false } }
+      }
+    }
+  });
+}
+
+function renderReflections() {
+  ['r1','r2','r3'].forEach(key => {
+    const container = document.getElementById('rtab-' + key);
+    if (!container) return;
+    reflections[key].forEach(item => {
+      const initials = item.name.slice(-1);
+      const card = document.createElement('div');
+      card.className = 'quote-card';
+      card.innerHTML = `
+        <div class="quote-mark">"</div>
+        <div class="quote-text">${item.text}</div>
+        <div class="quote-author">
+          <div class="author-dot">${initials}</div>
+          <div class="author-info">
+            <div class="author-name">${item.name}</div>
+            <div class="author-dept">${item.dept}</div>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  });
+}
+
+function renderPairedTable() {
+  const tbody = document.getElementById('pairedBody');
+  pairedData.forEach((row, i) => {
+    const preMean = (row.pre.reduce((a,b)=>a+b,0)/5).toFixed(2);
+    const postMean = (row.post.reduce((a,b)=>a+b,0)/5).toFixed(2);
+    const diff = (postMean - preMean).toFixed(2);
+    const diffClass = diff > 0 ? 'td-up' : (diff < 0 ? 'td-down' : 'td-same');
+    const diffStr = diff > 0 ? `▲ +${diff}` : (diff < 0 ? `▼ ${diff}` : `— ${diff}`);
+    const miniDots = row.post.map(v => `<span style="display:inline-block;width:8px;height:${v*5}px;background:var(--gold);opacity:0.6;border-radius:1px;vertical-align:bottom;margin:0 1px"></span>`).join('');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}. <strong>${row.name}</strong></td>
+      <td>${row.dept}</td>
+      <td class="td-pre">${preMean}</td>
+      <td class="td-post">${postMean}</td>
+      <td class="${diffClass}">${diffStr}</td>
+      <td>${miniDots}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderStats() {
+  const grid = document.getElementById('statsGrid');
+
+  const datasets = [
+    { title: '🏫 學員院校分布', data: schoolDist },
+    { title: '🏥 實習科別分布（前十）', data: Object.fromEntries(Object.entries(deptDist).slice(0,8)) },
+    { title: '🎓 年級分布', data: gradeDist },
+  ];
+
+  const maxVals = datasets.map(d => Math.max(...Object.values(d.data)));
+
+  datasets.forEach((ds, di) => {
+    const card = document.createElement('div');
+    card.className = 'dist-card reveal';
+    card.innerHTML = `<div class="dist-title">${ds.title}</div>` +
+      Object.entries(ds.data).map(([k,v]) => `
+        <div class="dist-item">
+          <div class="dist-label">${k}</div>
+          <div class="dist-bar-wrap">
+            <div class="dist-bar-fill" style="width:${v/maxVals[di]*100}%"></div>
+          </div>
+          <div class="dist-count">${v}</div>
+        </div>
+      `).join('');
+    grid.appendChild(card);
+  });
+}
+
+function renderSDChart() {
+  const ctx = document.getElementById('sdChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: scoreLabels,
+      datasets: [
+        { label: '前測 SD', data: preStds, backgroundColor: 'rgba(155,168,190,0.6)', borderRadius: 4 },
+        { label: '後測 SD', data: postStds, backgroundColor: 'rgba(201,168,76,0.7)', borderRadius: 4 },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Noto Sans TC' } } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw.toFixed(2)}` } },
+      },
+      scales: {
+        y: { min: 0, max: 1.6, ticks: { font: { family: 'Noto Sans TC' } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+        x: { ticks: { font: { family: 'Noto Sans TC', size: 12 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ===== NAV =====
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: document.querySelector('.nav-bar').offsetTop, behavior: 'smooth' });
+  setTimeout(setupReveal, 100);
+}
+
+function showRTab(id, btn) {
+  document.querySelectorAll('.rtab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.rtab').forEach(t => t.classList.remove('active'));
+  document.getElementById('rtab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== REVEAL ON SCROLL =====
+function setupReveal() {
+  const items = document.querySelectorAll('.reveal:not(.visible)');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  items.forEach(el => io.observe(el));
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
